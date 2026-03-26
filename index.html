@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>TISA506M Control Panel</title>
+  <style>
+    /* ── Reset & Base ── */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #ffffff;
+      --surface: #ffffff;
+      --surface2: #f5f7fb;
+      --border: #d0d6e4;
+      --accent: #00BCD4;
+      --accent-dim: #0096A8;
+      --accent-light: rgba(0, 188, 212, 0.12);
+      --accent-glow: rgba(0, 188, 212, 0.20);
+      --text: #1a1f2e;
+      --text-muted: #6b7897;
+      --danger: #FF0000;
+      --danger-light: rgba(220, 38, 38, 0.10);
+      --success: #16a34a;
+      --warning: #d97706;
+      --radius: 10px;
+      --radius-sm: 7px;
+      --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.06);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 90px;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 16px 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-logo {
+      height: 36px;
+      width: auto;
+      display: block;
+      flex-shrink: 0;
+    }
+
+    .header-text h1 {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      color: var(--text);
+    }
+
+    .header-text p {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    /* ── WS Status Badge ── */
+    .ws-status {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+      background: var(--surface2);
+      padding: 5px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .ws-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #dc2626;
+      transition: background 0.4s;
+    }
+
+    .ws-dot.connected {
+      background: #16a34a;
+    }
+
+    /* ── Main Content ── */
+    main {
+      max-width: 540px;
+      margin: 0 auto;
+      padding: 14px 14px 0;
+    }
+
+    /* ── Section Card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── Navigation Controls — same style as zoom-group ── */
+
+    /* ── Slider Rows ── */
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .slider-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .slider-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      width: 82px;
+      flex-shrink: 0;
+      font-weight: 500;
+    }
+
+    .slider-wrap {
+      flex: 1;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 5px;
+      border-radius: 3px;
+      background: var(--border);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      margin-top: -6px;
+      transition: transform 0.15s;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    input[type="range"]::-webkit-slider-thumb:active {
+      transform: scale(1.2);
+    }
+
+    .slider-val {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      width: 34px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* ── Button Groups ── */
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .btn-opt {
+      flex: 1;
+      min-width: 56px;
+      padding: 9px 7px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface2);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .btn-opt:hover {
+      border-color: var(--accent-dim);
+      color: var(--text);
+    }
+
+    .btn-opt.active {
+      background: var(--accent-light);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── Toggle Row ── */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .toggle-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .toggle-label {
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.25s;
+    }
+
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 3px;
+      top: 3px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.25s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .toggle input:checked+.toggle-slider {
+      background: var(--danger);
+    }
+
+    .toggle input:checked+.toggle-slider::before {
+      transform: translateX(20px);
+    }
+
+    /* ── Input Fields (number) ── */
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .input-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-group label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    .input-group input[type="number"],
+    .input-group select {
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 600;
+      padding: 10px 12px;
+      width: 100%;
+      outline: none;
+      text-align: center;
+      -moz-appearance: textfield;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-group input[type="number"]::-webkit-outer-spin-button,
+    .input-group input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+    }
+
+    .input-group input[type="number"]:focus,
+    .input-group select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    .input-group select {
+      cursor: pointer;
+      text-align: left;
+    }
+
+    /* ── Shutter Row ── */
+    .shutter-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .shutter-row .input-group label {
+      font-size: 11px;
+    }
+
+    /* ── Color Swatch Buttons ── */
+    .swatch-group {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .swatch-btn {
+      flex: 1;
+      min-width: 44px;
+      height: 34px;
+      border: 2px solid transparent;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 10px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .swatch-btn.active {
+      border-color: var(--text);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+
+    /* Polarity colors */
+    .sw-white {
+      background: #ccc;
+      color: #333;
+      text-shadow: none;
+    }
+
+    .sw-black {
+      background: #222;
+    }
+
+    .sw-sepia {
+      background: #FFDA45;
+      color: #333;
+      text-shadow: none;
+    }
+
+    .sw-fire {
+      background: linear-gradient(135deg, #f97316, #dc2626);
+    }
+
+    .sw-iron {
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+    }
+
+    .sw-rainbow {
+      background: linear-gradient(135deg, #f59e0b, #10b981, #3b82f6, #a855f7);
+    }
+
+    /* Reticle colors */
+    .sw-r-red {
+      background: #dc2626;
+    }
+
+    .sw-r-green {
+      background: #16a34a;
+    }
+
+    .sw-r-blue {
+      background: #2563eb;
+    }
+
+    .sw-r-yellow {
+      background: #ca8a04;
+    }
+
+    .sw-r-white {
+      background: #aaa;
+      color: #333;
+      text-shadow: none;
+    }
+
+    .sw-r-black {
+      background: #222;
+    }
+
+    /* Reticle sub-section */
+    .sub-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 8px;
+      margin-top: 12px;
+      letter-spacing: 0.3px;
+    }
+
+    /* ── Zoom jointed buttons ── */
+    .zoom-group {
+      display: flex;
+    }
+
+    .zoom-group .btn-opt {
+      border-radius: 0;
+      border-right-width: 0;
+    }
+
+    .zoom-group .btn-opt:first-child {
+      border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    }
+
+    .zoom-group .btn-opt:last-child {
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      border-right-width: 1.5px;
+    }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      bottom: 88px;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: #f0fdf4;
+      border: 1px solid #16a34a;
+      color: #15803d;
+      padding: 9px 20px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.28s;
+      z-index: 200;
+      white-space: nowrap;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    #toast.error {
+      background: #fef2f2;
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    /* ── Bottom Bar ── */
+    #saveBar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(240, 242, 247, 0.96);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+      z-index: 150;
+    }
+
+    .save-bar-inner {
+      display: flex;
+      gap: 10px;
+      max-width: 540px;
+      margin: 0 auto;
+      padding: 10px 14px;
+    }
+
+    .bar-btn {
+      flex: 1;
+      padding: 13px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 0.15s, filter 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .bar-btn:active {
+      transform: scale(0.97);
+      filter: brightness(0.92);
+    }
+
+    #saveBtn {
+      background: #00FF41;
+      color: #1a1f2e;
+      box-shadow: 0 3px 14px rgba(0, 255, 65, 0.35);
+    }
+
+    #saveBtn:disabled {
+      background: var(--border);
+      color: var(--text-muted);
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    #rebootBtn {
+      background: var(--danger-light);
+      color: var(--danger);
+      border: 1.5px solid #fca5a5;
+      flex: 0 0 auto;
+      padding: 13px 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── Header ── -->
+  <header>
+    <img src="logo.png" alt="TISA506M Logo" class="header-logo" />
+    <div class="header-text">
+      <h1>TISA506M</h1>
+      <p>Thermal Imaging GUI</p>
+    </div>
+    <div class="ws-status" id="wsStatus">
+      <div class="ws-dot" id="wsDot"></div>
+      <span id="wsLabel">Connecting</span>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ── 1. Navigation Controls ── -->
+    <div class="card">
+      <div class="card-title">Navigation Controls</div>
+      <div class="zoom-group">
+        <button class="btn-opt" id="navPlus">+</button>
+        <button class="btn-opt" id="navMenu">MENU</button>
+        <button class="btn-opt" id="navMinus">−</button>
+      </div>
+    </div>
+
+    <!-- ── 2. Zoom ── -->
+    <div class="card">
+      <div class="card-title">Zoom</div>
+
+      <div class="sub-label">Digital Zoom</div>
+      <div class="zoom-group" id="zoomGroup" style="margin-bottom:14px;">
+        <button class="btn-opt active" data-zoom="1">1X</button>
+        <button class="btn-opt" data-zoom="2">2X</button>
+        <button class="btn-opt" data-zoom="4">4X</button>
+      </div>
+
+      <div class="slider-row">
+        <span class="slider-label">Continuous</span>
+        <div class="slider-wrap">
+          <input type="range" id="contZoom" min="50" max="400" value="50" />
+        </div>
+        <span class="slider-val" id="contZoomVal">50</span>
+      </div>
+    </div>
+
+    <!-- ── 3. Image Display Settings ── -->
+    <div class="card">
+      <div class="card-title">Image Display Settings</div>
+
+      <div class="sub-label" style="margin-top:0;">AGC Mode</div>
+      <div class="btn-group" id="agcGroup" style="margin-bottom:14px;">
+        <button class="btn-opt active" data-agc="EWBG">EWBG</button>
+        <button class="btn-opt" data-agc="EWFG">EWFG</button>
+        <button class="btn-opt" data-agc="AL">AL</button>
+        <button class="btn-opt" data-agc="HL">HL</button>
+        <button class="btn-opt" data-agc="Manual">Manual</button>
+      </div>
+
+      <div class="slider-row">
+        <span class="slider-label">Brightness</span>
+        <div class="slider-wrap">
+          <input type="range" id="brightness" min="1" max="100" value="50" />
+        </div>
+        <span class="slider-val" id="brightnessVal">50</span>
+      </div>
+
+      <div class="slider-row">
+        <span class="slider-label">Contrast</span>
+        <div class="slider-wrap">
+          <input type="range" id="contrast" min="1" max="100" value="50" />
+        </div>
+        <span class="slider-val" id="contrastVal">50</span>
+      </div>
+
+      <div class="slider-row">
+        <span class="slider-label">Sharpness</span>
+        <div class="slider-wrap">
+          <input type="range" id="sharpness" min="1" max="10" value="5" />
+        </div>
+        <span class="slider-val" id="sharpnessVal">5</span>
+      </div>
+
+      <div class="slider-row">
+        <span class="slider-label">Denoise</span>
+        <div class="slider-wrap">
+          <input type="range" id="denoise" min="1" max="10" value="5" />
+        </div>
+        <span class="slider-val" id="denoiseVal">5</span>
+      </div>
+    </div>
+
+    <!-- ── 4. Color & Polarity ── -->
+    <div class="card">
+      <div class="card-title">Color & Polarity Mode</div>
+      <div class="swatch-group" id="polarityGroup">
+        <button class="swatch-btn sw-white active" data-polarity="WhiteHot">White Hot</button>
+        <button class="swatch-btn sw-black" data-polarity="BlackHot">Black Hot</button>
+        <button class="swatch-btn sw-sepia" data-polarity="Sepia">Sepia</button>
+        <button class="swatch-btn sw-fire" data-polarity="Fire">Fire</button>
+        <button class="swatch-btn sw-iron" data-polarity="Iron">Iron</button>
+        <button class="swatch-btn sw-rainbow" data-polarity="Rainbow">Rainbow</button>
+      </div>
+    </div>
+
+    <!-- AGC card removed: moved into Image Display Settings -->
+
+    <!-- ── 6. Shutter Control ── -->
+    <div class="card">
+      <div class="card-title">Shutter Control</div>
+      <div class="shutter-row input-row">
+        <div class="input-group">
+          <label for="shutterMode">Work Mode</label>
+          <select id="shutterMode">
+            <option value="1">Mode 1</option>
+            <option value="2">Mode 2</option>
+            <option value="3">Mode 3</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="shutterTime">Timing (min)</label>
+          <input type="number" id="shutterTime" value="5" min="1" max="999" placeholder="5" />
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 7. Reticle Configuration ── -->
+    <div class="card">
+      <div class="card-title">Reticle Configuration</div>
+
+      <div class="toggle-row">
+        <span class="toggle-label">Reticle</span>
+        <label class="toggle">
+          <input type="checkbox" id="reticleOn" checked />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="sub-label">Style</div>
+      <div class="btn-group" id="reticleStyleGroup" style="margin-bottom:0;">
+        <button class="btn-opt active" data-style="1">Style 1</button>
+        <button class="btn-opt" data-style="2">Style 2</button>
+        <button class="btn-opt" data-style="3">Style 3</button>
+        <button class="btn-opt" data-style="4">Style 4</button>
+      </div>
+
+      <div class="sub-label">Color</div>
+      <div class="swatch-group" id="reticleColorGroup" style="margin-bottom:0;">
+        <button class="swatch-btn sw-r-red active" data-rcolor="Red">Red</button>
+        <button class="swatch-btn sw-r-green" data-rcolor="Green">Green</button>
+        <button class="swatch-btn sw-r-blue" data-rcolor="Blue">Blue</button>
+        <button class="swatch-btn sw-r-yellow" data-rcolor="Yellow">Yellow</button>
+        <button class="swatch-btn sw-r-white" data-rcolor="White">White</button>
+        <button class="swatch-btn sw-r-black" data-rcolor="Black">Black</button>
+      </div>
+
+      <div class="sub-label">Ballistics Profile</div>
+      <div class="btn-group" id="ballisticsGroup" style="margin-bottom:0;">
+        <button class="btn-opt active" data-ballistics="G3">G3</button>
+        <button class="btn-opt" data-ballistics="SMG">SMG</button>
+        <button class="btn-opt" data-ballistics="M4">M4</button>
+        <button class="btn-opt" data-ballistics="M249">M249</button>
+      </div>
+
+      <div class="sub-label">Position</div>
+      <div class="input-row">
+        <div class="input-group">
+          <label for="reticleX">X Offset</label>
+          <input type="number" id="reticleX" value="0" placeholder="0" />
+        </div>
+        <div class="input-group">
+          <label for="reticleY">Y Offset</label>
+          <input type="number" id="reticleY" value="0" placeholder="0" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Display & Overlay card removed: OSD Info moved into Other Settings -->
+
+    <!-- ── 8. Other Settings ── -->
+    <div class="card">
+      <div class="card-title">Other Settings</div>
+
+      <div class="toggle-row">
+        <span class="toggle-label">OSD Info</span>
+        <label class="toggle">
+          <input type="checkbox" id="osdOn" checked />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-row">
+        <span class="toggle-label">Hot Tracking</span>
+        <label class="toggle">
+          <input type="checkbox" id="hotTracking" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-row">
+        <span class="toggle-label">Picture-in-Picture (PiP)</span>
+        <label class="toggle">
+          <input type="checkbox" id="pip" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-row">
+        <span class="toggle-label">Media Mode</span>
+        <label class="toggle">
+          <input type="checkbox" id="mediaMode" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── Toast ── -->
+  <div id="toast">Settings Transmitted</div>
+
+  <!-- ── Bottom Action Bar ── -->
+  <div id="saveBar">
+    <div class="save-bar-inner">
+      <button id="saveBtn" class="bar-btn">Save & Update</button>
+      <button id="rebootBtn" class="bar-btn">Reboot</button>
+    </div>
+  </div>
+
+  <!-- ── JavaScript ── -->
+  <script>
+    // ── Global State ──────────────────────────────
+    const state = {
+      // Navigation (ephemeral, not persisted in payload)
+      // Zoom
+      zoom: 1,
+      contZoom: 50,
+      // Image
+      brightness: 50,
+      contrast: 50,
+      sharpness: 5,
+      denoise: 5,
+      // Polarity
+      polarity: 'WhiteHot',
+      // AGC
+      agc: 'EWBG',
+      // Shutter
+      shutterMode: 1,
+      shutterTime: 5,
+      // Reticle
+      reticleOn: true,
+      reticleStyle: 1,
+      reticleColor: 'Red',
+      reticleX: 0,
+      reticleY: 0,
+      // Display
+      osdOn: true,
+      // Other
+      ballistics: 'G3',
+      hotTracking: false,
+      pip: false,
+      mediaMode: false
+    };
+
+    // ── WebSocket ─────────────────────────────────
+    let ws;
+    let reconnectTimer = null;
+
+    function connectWS() {
+      ws = new WebSocket('ws://192.168.4.1/ws');
+
+      ws.onopen = () => {
+        setWsStatus(true);
+        if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+      };
+
+      ws.onclose = () => {
+        setWsStatus(false);
+        reconnectTimer = setTimeout(connectWS, 3000);
+      };
+
+      ws.onerror = () => { ws.close(); };
+
+      ws.onmessage = (evt) => {
+        console.log('WS msg:', evt.data);
+      };
+    }
+
+    function setWsStatus(connected) {
+      document.getElementById('wsDot').classList.toggle('connected', connected);
+      document.getElementById('wsLabel').textContent = connected ? 'Connected' : 'Offline';
+      document.getElementById('saveBtn').disabled = !connected;
+    }
+
+    // ── Slider Helper ─────────────────────────────
+    function initSlider(id, stateKey) {
+      const el = document.getElementById(id);
+      const val = document.getElementById(id + 'Val');
+      function update() {
+        const pct = ((el.value - el.min) / (el.max - el.min)) * 100;
+        el.style.background =
+          `linear-gradient(to right, var(--accent) ${pct}%, var(--border) ${pct}%)`;
+        if (val) val.textContent = el.value;
+        state[stateKey] = Number(el.value);
+      }
+      el.addEventListener('input', update);
+      update();
+    }
+
+    // ── Sliders ───────────────────────────────────
+    initSlider('brightness', 'brightness');
+    initSlider('contrast', 'contrast');
+    initSlider('sharpness', 'sharpness');
+    initSlider('denoise', 'denoise');
+    initSlider('contZoom', 'contZoom');
+
+    // ── Generic Button Group ──────────────────────
+    function initBtnGroup(groupId, dataAttr, stateKey, parseNum) {
+      const group = document.getElementById(groupId);
+      group.addEventListener('click', e => {
+        const btn = e.target.closest('[data-' + dataAttr + ']');
+        if (!btn) return;
+        group.querySelectorAll('.btn-opt, .swatch-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state[stateKey] = parseNum ? parseInt(btn.dataset[dataAttr]) : btn.dataset[dataAttr];
+      });
+    }
+
+    initBtnGroup('zoomGroup', 'zoom', 'zoom', true);
+    initBtnGroup('agcGroup', 'agc', 'agc', false);
+    initBtnGroup('polarityGroup', 'polarity', 'polarity', false);
+    initBtnGroup('reticleStyleGroup', 'style', 'reticleStyle', true);
+    initBtnGroup('reticleColorGroup', 'rcolor', 'reticleColor', false);
+    initBtnGroup('ballisticsGroup', 'ballistics', 'ballistics', false);
+    initToggle('mediaMode', 'mediaMode');
+
+    // ── Toggles ───────────────────────────────────
+    function initToggle(id, stateKey) {
+      const el = document.getElementById(id);
+      el.addEventListener('change', () => { state[stateKey] = el.checked; });
+    }
+
+    initToggle('reticleOn', 'reticleOn');
+    initToggle('osdOn', 'osdOn');
+    initToggle('hotTracking', 'hotTracking');
+    initToggle('pip', 'pip');
+
+    // ── Shutter ───────────────────────────────────
+    document.getElementById('shutterMode').addEventListener('change', e => {
+      state.shutterMode = parseInt(e.target.value);
+    });
+    document.getElementById('shutterTime').addEventListener('input', e => {
+      state.shutterTime = parseInt(e.target.value) || 1;
+    });
+
+    // ── Reticle Position ──────────────────────────
+    document.getElementById('reticleX').addEventListener('input', e => {
+      state.reticleX = parseInt(e.target.value) || 0;
+    });
+    document.getElementById('reticleY').addEventListener('input', e => {
+      state.reticleY = parseInt(e.target.value) || 0;
+    });
+
+    // ── Navigation Buttons ────────────────────────
+    document.getElementById('navPlus').addEventListener('click', () => {
+      if (ws && ws.readyState === WebSocket.OPEN)
+        ws.send(JSON.stringify({ cmd: 'NAV_PLUS' }));
+    });
+    document.getElementById('navMinus').addEventListener('click', () => {
+      if (ws && ws.readyState === WebSocket.OPEN)
+        ws.send(JSON.stringify({ cmd: 'NAV_MINUS' }));
+    });
+    document.getElementById('navMenu').addEventListener('click', () => {
+      if (ws && ws.readyState === WebSocket.OPEN)
+        ws.send(JSON.stringify({ cmd: 'NAV_MENU' }));
+    });
+
+    // ── Toast ─────────────────────────────────────
+    let toastTimer = null;
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.toggle('error', isError);
+      t.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    // ── Save & Exit ───────────────────────────────
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        showToast('Not connected to device', true);
+        return;
+      }
+      // Sync final values
+      state.reticleX = parseInt(document.getElementById('reticleX').value) || 0;
+      state.reticleY = parseInt(document.getElementById('reticleY').value) || 0;
+      state.shutterTime = parseInt(document.getElementById('shutterTime').value) || 1;
+
+      ws.send(JSON.stringify({ cmd: 'SAVE', payload: state }));
+      console.log('Sent:', state);
+      showToast('Settings Transmitted');
+    });
+
+    // ── Reboot ────────────────────────────────────
+    document.getElementById('rebootBtn').addEventListener('click', () => {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        showToast('Not connected to device', true);
+        return;
+      }
+      if (!confirm('Reboot the device?')) return;
+      ws.send(JSON.stringify({ cmd: 'REBOOT' }));
+      showToast('Reboot command sent');
+    });
+
+    // ── Init ──────────────────────────────────────
+    setWsStatus(false);
+    connectWS();
+  </script>
+</body>
+
+</html>
