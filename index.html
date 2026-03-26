@@ -544,7 +544,7 @@
 
     #saveBtn {
       background: #00FF41;
-      color: #1a1f2e;
+      color: #fff;
       box-shadow: 0 3px 14px rgba(0, 255, 65, 0.35);
     }
 
@@ -556,11 +556,12 @@
     }
 
     #rebootBtn {
-      background: var(--danger-light);
-      color: var(--danger);
-      border: 1.5px solid #fca5a5;
+      background: var(--danger);
+      color: #fff;
+      border: none;
       flex: 0 0 auto;
       padding: 13px 20px;
+      box-shadow: 0 3px 14px rgba(255, 0, 0, 0.3);
     }
   </style>
 </head>
@@ -705,6 +706,7 @@
       </div>
 
       <div class="sub-label">Style</div>
+      <img src="Reticle styles.png" alt="Reticle Styles Reference" style="width:100%;border-radius:8px;margin-bottom:10px;border:1px solid var(--border);" />
       <div class="btn-group" id="reticleStyleGroup" style="margin-bottom:0;">
         <button class="btn-opt active" data-style="1">Style 1</button>
         <button class="btn-opt" data-style="2">Style 2</button>
@@ -857,7 +859,6 @@
     function setWsStatus(connected) {
       document.getElementById('wsDot').classList.toggle('connected', connected);
       document.getElementById('wsLabel').textContent = connected ? 'Connected' : 'Offline';
-      document.getElementById('saveBtn').disabled = !connected;
     }
 
     // ── Slider Helper ─────────────────────────────
