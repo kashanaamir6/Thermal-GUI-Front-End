@@ -143,8 +143,8 @@
     .slider-row {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 14px;
+      gap: 6px;
+      margin-bottom: 10px;
     }
 
     .slider-row:last-child {
@@ -154,13 +154,14 @@
     .slider-label {
       font-size: 12px;
       color: var(--text-muted);
-      width: 82px;
+      width: 72px;
       flex-shrink: 0;
       font-weight: 500;
     }
 
     .slider-wrap {
       flex: 1;
+      min-width: 0;
     }
 
     input[type="range"] {
@@ -193,7 +194,7 @@
       font-size: 13px;
       font-weight: 700;
       color: var(--accent);
-      width: 34px;
+      width: 28px;
       text-align: right;
       flex-shrink: 0;
     }
@@ -346,14 +347,45 @@
       text-align: left;
     }
 
-    /* ── Shutter Row ── */
-    .shutter-row {
-      display: flex;
-      gap: 10px;
+    /* ── Inline Step Buttons (next to sliders) ── */
+    .step-btn {
+      padding: 4px 9px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface2);
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s;
+      -webkit-tap-highlight-color: transparent;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
 
-    .shutter-row .input-group label {
+    .step-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .step-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* ── Toggle Off/On label ── */
+    .toggle-offon {
       font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* ── Note text ── */
+    .note-text {
+      font-size: 11px;
+      color: var(--warning);
+      margin-top: 8px;
+      font-style: italic;
     }
 
     /* ── Color Swatch Buttons ── */
@@ -389,9 +421,10 @@
 
     /* Polarity colors */
     .sw-white {
-      background: #ccc;
-      color: #333;
+      background: #ffffff;
+      color: #222;
       text-shadow: none;
+      border: 2px solid #bbb !important;
     }
 
     .sw-black {
@@ -418,7 +451,7 @@
 
     /* Reticle colors */
     .sw-r-red {
-      background: #dc2626;
+      background: #ff0f0f;
     }
 
     .sw-r-green {
@@ -434,13 +467,21 @@
     }
 
     .sw-r-white {
-      background: #aaa;
-      color: #333;
+      background: #ffffff;
+      color: #222;
       text-shadow: none;
+      border: 2px solid #bbb !important;
     }
 
     .sw-r-black {
       background: #222;
+    }
+
+    /* Nav active highlight */
+    .zoom-group .btn-opt.nav-active {
+      background: var(--accent-light);
+      border-color: var(--accent);
+      color: var(--accent);
     }
 
     /* Reticle sub-section */
@@ -543,9 +584,9 @@
     }
 
     #saveBtn {
-      background: #00FF41;
-      color: #fff;
-      box-shadow: 0 3px 14px rgba(0, 255, 65, 0.35);
+      background: #1565C0;
+      color: #ffffff;
+      box-shadow: 0 3px 14px rgba(21, 101, 192, 0.40);
     }
 
     #saveBtn:disabled {
@@ -553,6 +594,15 @@
       color: var(--text-muted);
       box-shadow: none;
       cursor: not-allowed;
+    }
+
+    #defaultBtn {
+      background: #16a34a;
+      color: #fff;
+      border: none;
+      flex: 0 0 auto;
+      padding: 13px 18px;
+      box-shadow: 0 3px 14px rgba(22, 163, 74, 0.35);
     }
 
     #rebootBtn {
@@ -586,10 +636,10 @@
     <!-- ── 1. Navigation Controls ── -->
     <div class="card">
       <div class="card-title">Navigation Controls</div>
-      <div class="zoom-group">
-        <button class="btn-opt" id="navPlus">+</button>
-        <button class="btn-opt" id="navMenu">MENU</button>
-        <button class="btn-opt" id="navMinus">−</button>
+      <div class="zoom-group" id="navGroup">
+        <button class="btn-opt" id="navPlus" data-nav="PLUS">Z/+</button>
+        <button class="btn-opt" id="navMenu" data-nav="MENU">MENU</button>
+        <button class="btn-opt" id="navMinus" data-nav="MINUS">P/-</button>
       </div>
     </div>
 
@@ -613,9 +663,9 @@
       </div>
     </div>
 
-    <!-- ── 3. Image Display Settings ── -->
+    <!-- ── 3. Image Parameters Settings ── -->
     <div class="card">
-      <div class="card-title">Image Display Settings</div>
+      <div class="card-title">Image Parameters Settings</div>
 
       <div class="sub-label" style="margin-top:0;">AGC Mode</div>
       <div class="btn-group" id="agcGroup" style="margin-bottom:14px;">
@@ -628,33 +678,41 @@
 
       <div class="slider-row">
         <span class="slider-label">Brightness</span>
+        <button class="step-btn" id="brightMinus">B−</button>
         <div class="slider-wrap">
           <input type="range" id="brightness" min="1" max="100" value="50" />
         </div>
+        <button class="step-btn" id="brightPlus">B+</button>
         <span class="slider-val" id="brightnessVal">50</span>
       </div>
 
       <div class="slider-row">
         <span class="slider-label">Contrast</span>
+        <button class="step-btn" id="contrastMinus">C−</button>
         <div class="slider-wrap">
           <input type="range" id="contrast" min="1" max="100" value="50" />
         </div>
+        <button class="step-btn" id="contrastPlus">C+</button>
         <span class="slider-val" id="contrastVal">50</span>
       </div>
 
       <div class="slider-row">
         <span class="slider-label">Sharpness</span>
+        <button class="step-btn" id="sharpMinus">S−</button>
         <div class="slider-wrap">
           <input type="range" id="sharpness" min="1" max="10" value="5" />
         </div>
+        <button class="step-btn" id="sharpPlus">S+</button>
         <span class="slider-val" id="sharpnessVal">5</span>
       </div>
 
       <div class="slider-row">
         <span class="slider-label">Denoise</span>
+        <button class="step-btn" id="denoiseMinus">D−</button>
         <div class="slider-wrap">
           <input type="range" id="denoise" min="1" max="10" value="5" />
         </div>
+        <button class="step-btn" id="denovisePlus">D+</button>
         <span class="slider-val" id="denoiseVal">5</span>
       </div>
     </div>
@@ -674,39 +732,25 @@
 
     <!-- AGC card removed: moved into Image Display Settings -->
 
-    <!-- ── 6. Shutter Control ── -->
-    <div class="card">
-      <div class="card-title">Shutter Control</div>
-      <div class="shutter-row input-row">
-        <div class="input-group">
-          <label for="shutterMode">Work Mode</label>
-          <select id="shutterMode">
-            <option value="1">Mode 1</option>
-            <option value="2">Mode 2</option>
-            <option value="3">Mode 3</option>
-          </select>
-        </div>
-        <div class="input-group">
-          <label for="shutterTime">Timing (min)</label>
-          <input type="number" id="shutterTime" value="5" min="1" max="999" placeholder="5" />
-        </div>
-      </div>
-    </div>
-
     <!-- ── 7. Reticle Configuration ── -->
     <div class="card">
       <div class="card-title">Reticle Configuration</div>
 
       <div class="toggle-row">
         <span class="toggle-label">Reticle</span>
-        <label class="toggle">
-          <input type="checkbox" id="reticleOn" checked />
-          <span class="toggle-slider"></span>
-        </label>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <span class="toggle-offon">Off</span>
+          <label class="toggle">
+            <input type="checkbox" id="reticleOn" checked />
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="toggle-offon">On</span>
+        </div>
       </div>
 
       <div class="sub-label">Style</div>
-      <img src="Reticle styles.png" alt="Reticle Styles Reference" style="width:100%;border-radius:8px;margin-bottom:10px;border:1px solid var(--border);" />
+      <img src="Reticle styles.png" alt="Reticle Styles Reference"
+        style="width:100%;border-radius:8px;margin-bottom:10px;border:1px solid var(--border);" />
       <div class="btn-group" id="reticleStyleGroup" style="margin-bottom:0;">
         <button class="btn-opt active" data-style="1">Style 1</button>
         <button class="btn-opt" data-style="2">Style 2</button>
@@ -716,12 +760,13 @@
 
       <div class="sub-label">Color</div>
       <div class="swatch-group" id="reticleColorGroup" style="margin-bottom:0;">
-        <button class="swatch-btn sw-r-red active" data-rcolor="Red">Red</button>
-        <button class="swatch-btn sw-r-green" data-rcolor="Green">Green</button>
-        <button class="swatch-btn sw-r-blue" data-rcolor="Blue">Blue</button>
-        <button class="swatch-btn sw-r-yellow" data-rcolor="Yellow">Yellow</button>
+        <button class="swatch-btn active" data-rcolor="Auto"
+          style="background:linear-gradient(to right, #fff 0%, #aaa 50%, #fff 100%);color:#444;text-shadow:none;border:2px solid #bbb !important;">Auto</button>
         <button class="swatch-btn sw-r-white" data-rcolor="White">White</button>
         <button class="swatch-btn sw-r-black" data-rcolor="Black">Black</button>
+        <button class="swatch-btn sw-r-green" data-rcolor="Green">Green</button>
+        <button class="swatch-btn sw-r-red" data-rcolor="Red">Red</button>
+        <button class="swatch-btn sw-r-blue" data-rcolor="Blue">Blue</button>
       </div>
 
       <div class="sub-label">Ballistics Profile</div>
@@ -736,13 +781,22 @@
       <div class="input-row">
         <div class="input-group">
           <label for="reticleX">X Offset</label>
-          <input type="number" id="reticleX" value="0" placeholder="0" />
+          <input type="number" id="reticleX" value="0" placeholder="e.g. +25 or -30" inputmode="text"
+            pattern="[+-]?[0-9]+" step="1" />
         </div>
         <div class="input-group">
           <label for="reticleY">Y Offset</label>
-          <input type="number" id="reticleY" value="0" placeholder="0" />
+          <input type="number" id="reticleY" value="0" placeholder="e.g. +25 or -30" inputmode="text"
+            pattern="[+-]?[0-9]+" step="1" />
         </div>
       </div>
+    </div>
+
+    <!-- ── 6. Bad Pixel Correction ── -->
+    <div class="card">
+      <div class="card-title">Bad Pixel Correction</div>
+      <button class="btn-opt" id="badPixelScanBtn" style="width:100%;padding:11px;">Bad Pixel Global Scan</button>
+      <p class="note-text">⚠ Please cover the lens before Bad Pixel Correction.</p>
     </div>
 
     <!-- Display & Overlay card removed: OSD Info moved into Other Settings -->
@@ -753,34 +807,50 @@
 
       <div class="toggle-row">
         <span class="toggle-label">OSD Info</span>
-        <label class="toggle">
-          <input type="checkbox" id="osdOn" checked />
-          <span class="toggle-slider"></span>
-        </label>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <span class="toggle-offon">Off</span>
+          <label class="toggle">
+            <input type="checkbox" id="osdOn" checked />
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="toggle-offon">On</span>
+        </div>
       </div>
 
       <div class="toggle-row">
         <span class="toggle-label">Hot Tracking</span>
-        <label class="toggle">
-          <input type="checkbox" id="hotTracking" />
-          <span class="toggle-slider"></span>
-        </label>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <span class="toggle-offon">Off</span>
+          <label class="toggle">
+            <input type="checkbox" id="hotTracking" />
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="toggle-offon">On</span>
+        </div>
       </div>
 
       <div class="toggle-row">
         <span class="toggle-label">Picture-in-Picture (PiP)</span>
-        <label class="toggle">
-          <input type="checkbox" id="pip" />
-          <span class="toggle-slider"></span>
-        </label>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <span class="toggle-offon">Off</span>
+          <label class="toggle">
+            <input type="checkbox" id="pip" />
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="toggle-offon">On</span>
+        </div>
       </div>
 
       <div class="toggle-row">
         <span class="toggle-label">Media Mode</span>
-        <label class="toggle">
-          <input type="checkbox" id="mediaMode" />
-          <span class="toggle-slider"></span>
-        </label>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <span class="toggle-offon">Off</span>
+          <label class="toggle">
+            <input type="checkbox" id="mediaMode" />
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="toggle-offon">On</span>
+        </div>
       </div>
     </div>
 
@@ -792,7 +862,8 @@
   <!-- ── Bottom Action Bar ── -->
   <div id="saveBar">
     <div class="save-bar-inner">
-      <button id="saveBtn" class="bar-btn">Save & Update</button>
+      <button id="saveBtn" class="bar-btn">Save &amp; Update</button>
+      <button id="defaultBtn" class="bar-btn">Default</button>
       <button id="rebootBtn" class="bar-btn">Reboot</button>
     </div>
   </div>
@@ -800,37 +871,27 @@
   <!-- ── JavaScript ── -->
   <script>
     // ── Global State ──────────────────────────────
-    const state = {
-      // Navigation (ephemeral, not persisted in payload)
-      // Zoom
+    const DEFAULTS = {
       zoom: 1,
       contZoom: 50,
-      // Image
       brightness: 50,
       contrast: 50,
       sharpness: 5,
       denoise: 5,
-      // Polarity
       polarity: 'WhiteHot',
-      // AGC
       agc: 'EWBG',
-      // Shutter
-      shutterMode: 1,
-      shutterTime: 5,
-      // Reticle
       reticleOn: true,
       reticleStyle: 1,
-      reticleColor: 'Red',
+      reticleColor: 'Auto',
       reticleX: 0,
       reticleY: 0,
-      // Display
       osdOn: true,
-      // Other
       ballistics: 'G3',
       hotTracking: false,
       pip: false,
       mediaMode: false
     };
+    const state = Object.assign({}, DEFAULTS);
 
     // ── WebSocket ─────────────────────────────────
     let ws;
@@ -883,6 +944,22 @@
     initSlider('denoise', 'denoise');
     initSlider('contZoom', 'contZoom');
 
+    // ── Step Buttons (Brightness / Contrast) ──────
+    function stepSlider(id, stateKey, delta) {
+      const el = document.getElementById(id);
+      const newVal = Math.min(Number(el.max), Math.max(Number(el.min), Number(el.value) + delta));
+      el.value = newVal;
+      el.dispatchEvent(new Event('input'));
+    }
+    document.getElementById('brightPlus').addEventListener('click', () => stepSlider('brightness', 'brightness', 1));
+    document.getElementById('brightMinus').addEventListener('click', () => stepSlider('brightness', 'brightness', -1));
+    document.getElementById('contrastPlus').addEventListener('click', () => stepSlider('contrast', 'contrast', 1));
+    document.getElementById('contrastMinus').addEventListener('click', () => stepSlider('contrast', 'contrast', -1));
+    document.getElementById('sharpPlus').addEventListener('click', () => stepSlider('sharpness', 'sharpness', 1));
+    document.getElementById('sharpMinus').addEventListener('click', () => stepSlider('sharpness', 'sharpness', -1));
+    document.getElementById('denovisePlus').addEventListener('click', () => stepSlider('denoise', 'denoise', 1));
+    document.getElementById('denoiseMinus').addEventListener('click', () => stepSlider('denoise', 'denoise', -1));
+
     // ── Generic Button Group ──────────────────────
     function initBtnGroup(groupId, dataAttr, stateKey, parseNum) {
       const group = document.getElementById(groupId);
@@ -901,7 +978,6 @@
     initBtnGroup('reticleStyleGroup', 'style', 'reticleStyle', true);
     initBtnGroup('reticleColorGroup', 'rcolor', 'reticleColor', false);
     initBtnGroup('ballisticsGroup', 'ballistics', 'ballistics', false);
-    initToggle('mediaMode', 'mediaMode');
 
     // ── Toggles ───────────────────────────────────
     function initToggle(id, stateKey) {
@@ -913,35 +989,37 @@
     initToggle('osdOn', 'osdOn');
     initToggle('hotTracking', 'hotTracking');
     initToggle('pip', 'pip');
+    initToggle('mediaMode', 'mediaMode');
 
-    // ── Shutter ───────────────────────────────────
-    document.getElementById('shutterMode').addEventListener('change', e => {
-      state.shutterMode = parseInt(e.target.value);
-    });
-    document.getElementById('shutterTime').addEventListener('input', e => {
-      state.shutterTime = parseInt(e.target.value) || 1;
-    });
+    // ── Reticle Position (integers only) ─────────
+    function bindIntInput(id, stateKey) {
+      const el = document.getElementById(id);
+      el.addEventListener('input', () => {
+        el.value = el.value.replace(/[^0-9\-]/g, '');
+        state[stateKey] = parseInt(el.value) || 0;
+      });
+      el.addEventListener('keydown', e => {
+        // Allow: digits, minus, backspace, delete, arrows, tab, enter
+        if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter', '-'].includes(e.key)) return;
+        if (e.key >= '0' && e.key <= '9') return;
+        e.preventDefault();
+      });
+    }
+    bindIntInput('reticleX', 'reticleX');
+    bindIntInput('reticleY', 'reticleY');
 
-    // ── Reticle Position ──────────────────────────
-    document.getElementById('reticleX').addEventListener('input', e => {
-      state.reticleX = parseInt(e.target.value) || 0;
-    });
-    document.getElementById('reticleY').addEventListener('input', e => {
-      state.reticleY = parseInt(e.target.value) || 0;
-    });
-
-    // ── Navigation Buttons ────────────────────────
-    document.getElementById('navPlus').addEventListener('click', () => {
+    // ── Navigation Buttons (with active highlight) ──
+    const NAV_CMDS = { PLUS: 'NAV_PLUS', MENU: 'NAV_MENU', MINUS: 'NAV_MINUS' };
+    document.getElementById('navGroup').addEventListener('click', e => {
+      const btn = e.target.closest('[data-nav]');
+      if (!btn) return;
+      // Flash active state for 600ms (momentary press feel)
+      document.querySelectorAll('#navGroup .btn-opt').forEach(b => b.classList.remove('nav-active'));
+      btn.classList.add('nav-active');
+      setTimeout(() => btn.classList.remove('nav-active'), 600);
+      // Send WS command
       if (ws && ws.readyState === WebSocket.OPEN)
-        ws.send(JSON.stringify({ cmd: 'NAV_PLUS' }));
-    });
-    document.getElementById('navMinus').addEventListener('click', () => {
-      if (ws && ws.readyState === WebSocket.OPEN)
-        ws.send(JSON.stringify({ cmd: 'NAV_MINUS' }));
-    });
-    document.getElementById('navMenu').addEventListener('click', () => {
-      if (ws && ws.readyState === WebSocket.OPEN)
-        ws.send(JSON.stringify({ cmd: 'NAV_MENU' }));
+        ws.send(JSON.stringify({ cmd: NAV_CMDS[btn.dataset.nav] }));
     });
 
     // ── Toast ─────────────────────────────────────
@@ -955,20 +1033,65 @@
       toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
     }
 
-    // ── Save & Exit ───────────────────────────────
+    // ── Save & Update ─────────────────────────────
     document.getElementById('saveBtn').addEventListener('click', () => {
       if (!ws || ws.readyState !== WebSocket.OPEN) {
         showToast('Not connected to device', true);
         return;
       }
-      // Sync final values
       state.reticleX = parseInt(document.getElementById('reticleX').value) || 0;
       state.reticleY = parseInt(document.getElementById('reticleY').value) || 0;
-      state.shutterTime = parseInt(document.getElementById('shutterTime').value) || 1;
 
       ws.send(JSON.stringify({ cmd: 'SAVE', payload: state }));
       console.log('Sent:', state);
       showToast('Settings Transmitted');
+    });
+
+    // ── Default Reset ─────────────────────────────
+    document.getElementById('defaultBtn').addEventListener('click', () => {
+      Object.assign(state, DEFAULTS);
+
+      // Sliders
+      ['brightness', 'contrast', 'sharpness', 'denoise', 'contZoom'].forEach(id => {
+        const stateKey = id === 'contZoom' ? 'contZoom' : id;
+        document.getElementById(id).value = DEFAULTS[stateKey] ?? DEFAULTS[id];
+        document.getElementById(id).dispatchEvent(new Event('input'));
+      });
+
+      // Button groups
+      [['zoomGroup', 'zoom', 'zoom'], ['agcGroup', 'agc', 'agc'],
+      ['polarityGroup', 'polarity', 'polarity'], ['reticleStyleGroup', 'style', 'reticleStyle'],
+      ['reticleColorGroup', 'rcolor', 'reticleColor'], ['ballisticsGroup', 'ballistics', 'ballistics']
+      ].forEach(([gid, attr, sk]) => {
+        const g = document.getElementById(gid);
+        g.querySelectorAll('.btn-opt,.swatch-btn').forEach(b => b.classList.remove('active'));
+        const def = String(DEFAULTS[sk]);
+        const target = g.querySelector(`[data-${attr}="${def}"]`);
+        if (target) target.classList.add('active');
+      });
+
+      // Toggles
+      [['reticleOn', 'reticleOn'], ['osdOn', 'osdOn'],
+      ['hotTracking', 'hotTracking'], ['pip', 'pip'], ['mediaMode', 'mediaMode']
+      ].forEach(([id, sk]) => {
+        document.getElementById(id).checked = DEFAULTS[sk];
+      });
+
+      // Position fields
+      document.getElementById('reticleX').value = DEFAULTS.reticleX;
+      document.getElementById('reticleY').value = DEFAULTS.reticleY;
+
+      showToast('Defaults restored');
+    });
+
+    // ── Bad Pixel Global Scan ─────────────────────
+    document.getElementById('badPixelScanBtn').addEventListener('click', () => {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        showToast('Not connected to device', true);
+        return;
+      }
+      ws.send(JSON.stringify({ cmd: 'BAD_PIXEL_SCAN' }));
+      showToast('Bad Pixel Scan initiated');
     });
 
     // ── Reboot ────────────────────────────────────
