@@ -166,6 +166,7 @@
 
     input[type="range"] {
       -webkit-appearance: none;
+      appearance: none;
       width: 100%;
       height: 5px;
       border-radius: 3px;
@@ -315,7 +316,7 @@
       letter-spacing: 0.3px;
     }
 
-    .input-group input[type="number"],
+    .input-group input[type="text"],
     .input-group select {
       background: var(--surface2);
       border: 1.5px solid var(--border);
@@ -327,16 +328,10 @@
       width: 100%;
       outline: none;
       text-align: center;
-      -moz-appearance: textfield;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    .input-group input[type="number"]::-webkit-outer-spin-button,
-    .input-group input[type="number"]::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-    }
-
-    .input-group input[type="number"]:focus,
+    .input-group input[type="text"]:focus,
     .input-group select:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 3px var(--accent-light);
@@ -613,6 +608,15 @@
       padding: 13px 20px;
       box-shadow: 0 3px 14px rgba(255, 0, 0, 0.3);
     }
+
+    #exitBtn {
+      background: #f97316;
+      color: #fff;
+      border: none;
+      flex: 0 0 auto;
+      padding: 13px 18px;
+      box-shadow: 0 3px 14px rgba(249, 115, 22, 0.40);
+    }
   </style>
 </head>
 
@@ -657,9 +661,15 @@
       <div class="slider-row">
         <span class="slider-label">Continuous</span>
         <div class="slider-wrap">
-          <input type="range" id="contZoom" min="50" max="400" value="50" />
+          <input type="range" id="contZoom" min="50" max="400" value="100" />
         </div>
-        <span class="slider-val" id="contZoomVal">50</span>
+        <span class="slider-val" id="contZoomVal">100</span>
+      </div>
+      <div class="zoom-group" id="contZoomPresets" style="margin-top:10px;">
+        <button class="btn-opt" data-czoom="60">0.6×</button>
+        <button class="btn-opt" data-czoom="99">0.9×</button>
+        <button class="btn-opt active" data-czoom="100">1×</button>
+        <button class="btn-opt" data-czoom="400">4×</button>
       </div>
     </div>
 
@@ -712,7 +722,7 @@
         <div class="slider-wrap">
           <input type="range" id="denoise" min="1" max="10" value="5" />
         </div>
-        <button class="step-btn" id="denovisePlus">D+</button>
+        <button class="step-btn" id="denoisePlus">D+</button>
         <span class="slider-val" id="denoiseVal">5</span>
       </div>
     </div>
@@ -781,13 +791,11 @@
       <div class="input-row">
         <div class="input-group">
           <label for="reticleX">X Offset</label>
-          <input type="number" id="reticleX" value="0" placeholder="e.g. +25 or -30" inputmode="text"
-            pattern="[+-]?[0-9]+" step="1" />
+          <input type="text" id="reticleX" value="0" placeholder="e.g. +25 or -30" inputmode="text" autocomplete="off" />
         </div>
         <div class="input-group">
           <label for="reticleY">Y Offset</label>
-          <input type="number" id="reticleY" value="0" placeholder="e.g. +25 or -30" inputmode="text"
-            pattern="[+-]?[0-9]+" step="1" />
+          <input type="text" id="reticleY" value="0" placeholder="e.g. +25 or -30" inputmode="text" autocomplete="off" />
         </div>
       </div>
     </div>
@@ -862,9 +870,10 @@
   <!-- ── Bottom Action Bar ── -->
   <div id="saveBar">
     <div class="save-bar-inner">
-      <button id="saveBtn" class="bar-btn">Save &amp; Update</button>
       <button id="defaultBtn" class="bar-btn">Default</button>
       <button id="rebootBtn" class="bar-btn">Reboot</button>
+      <button id="exitBtn" class="bar-btn">Save &amp; Exit</button>
+      <button id="saveBtn" class="bar-btn">&#9992; Send</button>
     </div>
   </div>
 
@@ -873,7 +882,7 @@
     // ── Global State ──────────────────────────────
     const DEFAULTS = {
       zoom: 1,
-      contZoom: 50,
+      contZoom: 100,
       brightness: 50,
       contrast: 50,
       sharpness: 5,
@@ -957,7 +966,7 @@
     document.getElementById('contrastMinus').addEventListener('click', () => stepSlider('contrast', 'contrast', -1));
     document.getElementById('sharpPlus').addEventListener('click', () => stepSlider('sharpness', 'sharpness', 1));
     document.getElementById('sharpMinus').addEventListener('click', () => stepSlider('sharpness', 'sharpness', -1));
-    document.getElementById('denovisePlus').addEventListener('click', () => stepSlider('denoise', 'denoise', 1));
+    document.getElementById('denoisePlus').addEventListener('click', () => stepSlider('denoise', 'denoise', 1));
     document.getElementById('denoiseMinus').addEventListener('click', () => stepSlider('denoise', 'denoise', -1));
 
     // ── Generic Button Group ──────────────────────
@@ -979,6 +988,18 @@
     initBtnGroup('reticleColorGroup', 'rcolor', 'reticleColor', false);
     initBtnGroup('ballisticsGroup', 'ballistics', 'ballistics', false);
 
+    // ── Continuous Zoom Presets ───────────────────
+    document.getElementById('contZoomPresets').addEventListener('click', e => {
+      const btn = e.target.closest('[data-czoom]');
+      if (!btn) return;
+      const val = parseInt(btn.dataset.czoom);
+      const slider = document.getElementById('contZoom');
+      slider.value = val;
+      slider.dispatchEvent(new Event('input'));
+      document.querySelectorAll('#contZoomPresets .btn-opt').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+
     // ── Toggles ───────────────────────────────────
     function initToggle(id, stateKey) {
       const el = document.getElementById(id);
@@ -995,12 +1016,16 @@
     function bindIntInput(id, stateKey) {
       const el = document.getElementById(id);
       el.addEventListener('input', () => {
-        el.value = el.value.replace(/[^0-9\-]/g, '');
-        state[stateKey] = parseInt(el.value) || 0;
+        // Allow an optional leading +/-, followed by digits only
+        let v = el.value.replace(/[^0-9+\-]/g, '');
+        // Only permit sign at the very start
+        v = v.replace(/(?!^)[+\-]/g, '');
+        el.value = v;
+        state[stateKey] = parseInt(v) || 0;
       });
       el.addEventListener('keydown', e => {
-        // Allow: digits, minus, backspace, delete, arrows, tab, enter
-        if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter', '-'].includes(e.key)) return;
+        // Allow: digits, +, -, backspace, delete, arrows, tab, enter
+        if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter', '-', '+'].includes(e.key)) return;
         if (e.key >= '0' && e.key <= '9') return;
         e.preventDefault();
       });
@@ -1103,6 +1128,14 @@
       if (!confirm('Reboot the device?')) return;
       ws.send(JSON.stringify({ cmd: 'REBOOT' }));
       showToast('Reboot command sent');
+    });
+
+    // ── Exit ──────────────────────────────────────
+    document.getElementById('exitBtn').addEventListener('click', () => {
+      if (confirm('Exit the control panel?')) {
+        if (ws) ws.close();
+        window.close();
+      }
     });
 
     // ── Init ──────────────────────────────────────
