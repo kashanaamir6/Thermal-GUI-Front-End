@@ -1140,12 +1140,14 @@
       showToast('Reboot command sent');
     });
 
-    // ── Exit ──────────────────────────────────────
+    // ── Save & Exit (Thermal Imager Menu) ──────────
     document.getElementById('exitBtn').addEventListener('click', () => {
-      if (confirm('Exit the control panel?')) {
-        if (ws) ws.close();
-        window.close();
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        showToast('Not connected to device', true);
+        return;
       }
+      ws.send(JSON.stringify({ cmd: 'SAVE_EXIT' }));
+      showToast('Save & Exit command sent');
     });
 
     // ── Init ──────────────────────────────────────
