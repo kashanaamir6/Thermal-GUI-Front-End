@@ -277,6 +277,8 @@
       background: var(--accent-light);
       border-color: var(--accent);
       color: var(--accent);
+      z-index: 2; /* Ensure active button is on top for border visibility */
+      box-shadow: 0 0 0 1px var(--accent);
     }
 
     /* ── Toggle Row ── */
@@ -552,6 +554,20 @@
       border-right-width: 1.5px;
     }
 
+    .zoom-group .btn-opt:hover,
+    .zoom-group .btn-opt.active,
+    .zoom-group .btn-opt.nav-active {
+      border-right-width: 1.5px;
+      margin-right: -1.5px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .zoom-group .btn-opt:last-child:hover,
+    .zoom-group .btn-opt:last-child.active {
+      margin-right: 0;
+    }
+
     /* ── Toast ── */
     #toast {
       position: fixed;
@@ -799,10 +815,10 @@
       <img src="Reticle styles.png" alt="Reticle Styles Reference"
         style="width:100%;border-radius:8px;margin-bottom:10px;border:1px solid var(--border);" />
       <div class="btn-group" id="reticleStyleGroup" style="margin-bottom:0;">
-        <button class="btn-opt active" data-style="1">Style 1</button>
-        <button class="btn-opt" data-style="2">Style 2</button>
-        <button class="btn-opt" data-style="3">Style 3</button>
-        <button class="btn-opt" data-style="4">Style 4</button>
+        <button class="btn-opt active" data-rstyle="1">Style 1</button>
+        <button class="btn-opt" data-rstyle="2">Style 2</button>
+        <button class="btn-opt" data-rstyle="3">Style 3</button>
+        <button class="btn-opt" data-rstyle="4">Style 4</button>
       </div>
 
       <div class="sub-label">Color</div>
@@ -990,7 +1006,9 @@
     document.body.addEventListener('click', e => {
       const stepBtn = e.target.closest('.step-btn');
       if (stepBtn) {
-        const id = stepBtn.id.replace(/(Plus|Minus)$/, '');
+        const map = { bright: 'brightness', sharp: 'sharpness' };
+        let id = stepBtn.id.replace(/(Plus|Minus)$/, '');
+        id = map[id] || id;
         const delta = stepBtn.id.endsWith('Plus') ? 1 : -1;
         const el = UI.sliders[id].el;
         el.value = Math.min(el.max, Math.max(el.min, Number(el.value) + delta));
@@ -1065,12 +1083,30 @@
 
     document.getElementById('defaultBtn').onclick = () => {
       Object.assign(state, DEFAULTS);
+      // Update Sliders
       Object.keys(UI.sliders).forEach(id => {
         UI.sliders[id].el.value = DEFAULTS[id];
         updateSlider(id);
       });
+      // Update Toggles
+      ['reticleOn', 'osdOn', 'hotTracking', 'pip', 'mediaMode'].forEach(id => {
+        document.getElementById(id).checked = DEFAULTS[id];
+      });
+      // Update Inputs
+      UI.reticleX.value = DEFAULTS.reticleX;
+      UI.reticleY.value = DEFAULTS.reticleY;
+      // Update Button Group Highlights
+      document.querySelectorAll('.btn-opt.active, .swatch-btn.active').forEach(b => b.classList.remove('active'));
+      ['zoomGroup', 'agcGroup', 'polarityGroup', 'reticleStyleGroup', 'reticleColorGroup', 'ballisticsGroup'].forEach(gid => {
+        const group = document.getElementById(gid);
+        const attr = gid.replace('Group', '').replace('reticle', 'r').toLowerCase();
+        const key = gid.replace('Group', '');
+        const stateKey = key.startsWith('reticle') ? key : key.charAt(0).toLowerCase() + key.slice(1);
+        const val = DEFAULTS[stateKey];
+        const target = group.querySelector(`[data-${attr}="${val}"]`);
+        if (target) target.classList.add('active');
+      });
       showToast('Defaults restored');
-      setTimeout(() => location.reload(), 500);
     };
 
     // ── Theme Logic ──────────────────────────────
