@@ -595,8 +595,7 @@
       background: #16a34a;
       color: #fff;
       border: none;
-      flex: 0 0 auto;
-      padding: 13px 18px;
+      padding: 13px 10px;
       box-shadow: 0 3px 14px rgba(22, 163, 74, 0.35);
     }
 
@@ -604,8 +603,7 @@
       background: var(--danger);
       color: #fff;
       border: none;
-      flex: 0 0 auto;
-      padding: 13px 20px;
+      padding: 13px 10px;
       box-shadow: 0 3px 14px rgba(255, 0, 0, 0.3);
     }
 
@@ -613,9 +611,21 @@
       background: #f97316;
       color: #fff;
       border: none;
-      flex: 0 0 auto;
-      padding: 13px 18px;
+      padding: 13px 10px;
       box-shadow: 0 3px 14px rgba(249, 115, 22, 0.40);
+    }
+
+    /* Small mobile adjustments */
+    @media (max-width: 420px) {
+      .save-bar-inner {
+        padding: 8px 6px;
+        gap: 6px;
+      }
+      .bar-btn {
+        padding: 12px 4px;
+        font-size: 11px;
+        letter-spacing: 0.2px;
+      }
     }
   </style>
 </head>
