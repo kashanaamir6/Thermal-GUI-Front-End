@@ -852,17 +852,88 @@
         <button class="btn-opt" data-ballistics="M249">M249</button>
       </div>
 
-      <div class="sub-label">Position</div>
-      <div class="input-row">
+      <div class="sub-label" style="display:flex; justify-content:space-between; align-items:center;">
+        Position
+        <div class="btn-group" id="correctionModeGroup" style="gap:4px;">
+          <button class="btn-opt active" data-cmode="manual" style="padding:4px 8px; min-width:0; font-size:10px;">Manual</button>
+          <button class="btn-opt" data-cmode="assisted" style="padding:4px 8px; min-width:0; font-size:10px;">Assisted</button>
+        </div>
+      </div>
+
+      <!-- Manual Mode -->
+      <div id="manualCorrectionView" class="input-row">
         <div class="input-group">
           <label for="reticleX">X Offset</label>
-          <input type="text" id="reticleX" value="0" placeholder="e.g. +25 or -30" inputmode="text"
-            autocomplete="off" />
+          <input type="text" id="reticleX" value="0" placeholder="e.g. +25 or -30" inputmode="text" autocomplete="off" />
         </div>
         <div class="input-group">
           <label for="reticleY">Y Offset</label>
-          <input type="text" id="reticleY" value="0" placeholder="e.g. +25 or -30" inputmode="text"
-            autocomplete="off" />
+          <input type="text" id="reticleY" value="0" placeholder="e.g. +25 or -30" inputmode="text" autocomplete="off" />
+        </div>
+        <div class="input-group" style="flex:0.4;">
+          <label>&nbsp;</label>
+          <button class="btn-opt" id="manualResetOffsets" style="height:100%; font-weight:700; padding:0;">Reset</button>
+        </div>
+      </div>
+
+      <!-- Assisted Mode -->
+      <div id="assistedCorrectionView" style="display:none; flex-direction:column; gap:12px;">
+        <div style="background:var(--surface2); padding:8px; border-radius:var(--radius-sm); border:1px solid var(--border);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Current Offset</div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label>X Offset</label>
+              <input type="text" id="assistInitX" value="0" inputmode="text" />
+            </div>
+            <div class="input-group">
+              <label>Y Offset</label>
+              <input type="text" id="assistInitY" value="0" inputmode="text" />
+            </div>
+            <div class="input-group" style="flex:0.4;">
+              <label>&nbsp;</label>
+              <button class="btn-opt" id="assistResetOffsets" style="height:100%; font-weight:700; background:var(--bg); padding:0;">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Bullet Impact Error (cm at 100m)</div>
+        <div class="input-row">
+          <div class="input-group">
+            <div style="display:flex; gap:6px;">
+              <input type="text" id="assistErrX" value="0" inputmode="numeric" style="width:40px; padding:8px 4px;" />
+              <div class="btn-group" id="errDirX" style="flex:1;">
+                <button class="btn-opt active" data-dirx="Right">Right</button>
+                <button class="btn-opt" data-dirx="Left">Left</button>
+              </div>
+            </div>
+          </div>
+          <div class="input-group">
+            <div style="display:flex; gap:6px;">
+              <input type="text" id="assistErrY" value="0" inputmode="numeric" style="width:40px; padding:8px 4px;" />
+              <div class="btn-group" id="errDirY" style="flex:1;">
+                <button class="btn-opt active" data-diry="Up">Up</button>
+                <button class="btn-opt" data-diry="Down">Down</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px;">Calculated Corrective Offset</div>
+        <div class="input-row">
+          <div class="input-group">
+            <div style="display:flex; gap:6px;">
+              <input type="text" id="assistCalcX" value="0" readonly style="flex:1; background:var(--bg); border-color:var(--accent-dim); color:var(--accent);" />
+              <button class="btn-opt" id="assistUpdateX" style="flex:1.5; font-size:11px; font-weight:700; background:var(--accent-light); color:var(--accent); border-color:var(--accent);">Update X</button>
+            </div>
+          </div>
+          <div class="input-group">
+            <div style="display:flex; gap:6px;">
+              <input type="text" id="assistCalcY" value="0" readonly style="flex:1; background:var(--bg); border-color:var(--accent-dim); color:var(--accent);" />
+              <button class="btn-opt" id="assistUpdateY" style="flex:1.5; font-size:11px; font-weight:700; background:var(--accent-light); color:var(--accent); border-color:var(--accent);">Update Y</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1090,17 +1161,125 @@
       btn.classList.add('active');
     };
 
-    // X/Y Inputs
+    // ── Assisted Zeroing Setup ────────────────────
+    const initX = document.getElementById('assistInitX');
+    const initY = document.getElementById('assistInitY');
+    const errX = document.getElementById('assistErrX');
+    const errY = document.getElementById('assistErrY');
+    const calcX = document.getElementById('assistCalcX');
+    const calcY = document.getElementById('assistCalcY');
+    
+    let assistState = { dirX: 'Right', dirY: 'Up' };
+
+    const updateCalculator = () => {
+      let ix = parseInt(initX.value) || 0;
+      let iy = parseInt(initY.value) || 0;
+      let ex = parseInt(errX.value) || 0;
+      let ey = parseInt(errY.value) || 0;
+
+      let newX = ix + (assistState.dirX === 'Right' ? ex : -ex);
+      let newY = iy + (assistState.dirY === 'Up' ? ey : -ey);
+
+      calcX.value = newX > 0 ? '+' + newX : newX;
+      calcY.value = newY > 0 ? '+' + newY : newY;
+    };
+
+    // X/Y Inputs synced
     [UI.reticleX, UI.reticleY].forEach(el => {
       el.oninput = () => {
-        el.value = el.value.replace(/[^0-9+\-]/g, '').replace(/(?!^)[+\-]/g, '');
-        state[el.id] = parseInt(el.value) || 0;
+        let v = el.value.replace(/[^0-9+\-]/g, '').replace(/(?!^)[+\-]/g, '');
+        if (v === '+0' || v === '-0') v = '0';
+        el.value = v;
+        state[el.id] = parseInt(v) || 0;
+        
+        if (el.id === 'reticleX') initX.value = v || 0;
+        else initY.value = v || 0;
+        updateCalculator();
       };
       el.onkeydown = e => {
         if (!['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter', '-', '+'].includes(e.key) && 
             (e.key < '0' || e.key > '9')) e.preventDefault();
       };
     });
+
+    [initX, initY].forEach(el => {
+      el.oninput = () => {
+        let v = el.value.replace(/[^0-9+\-]/g, '').replace(/(?!^)[+\-]/g, '');
+        if (v === '+0' || v === '-0') v = '0';
+        el.value = v;
+        updateCalculator();
+      };
+    });
+
+    [errX, errY].forEach(el => {
+      el.oninput = () => {
+        el.value = el.value.replace(/[^0-9]/g, '');
+        updateCalculator();
+      };
+    });
+
+    document.getElementById('errDirX').onclick = e => {
+      const btn = e.target.closest('[data-dirx]');
+      if (!btn) return;
+      document.querySelectorAll('#errDirX .btn-opt').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      assistState.dirX = btn.dataset.dirx;
+      updateCalculator();
+    };
+
+    document.getElementById('errDirY').onclick = e => {
+      const btn = e.target.closest('[data-diry]');
+      if (!btn) return;
+      document.querySelectorAll('#errDirY .btn-opt').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      assistState.dirY = btn.dataset.diry;
+      updateCalculator();
+    };
+
+    document.getElementById('assistUpdateX').onclick = () => {
+      UI.reticleX.value = calcX.value;
+      state.reticleX = parseInt(calcX.value) || 0;
+      initX.value = calcX.value;
+      errX.value = "0";
+      updateCalculator();
+      showToast('X Offset Updated!');
+    };
+
+    document.getElementById('assistUpdateY').onclick = () => {
+      UI.reticleY.value = calcY.value;
+      state.reticleY = parseInt(calcY.value) || 0;
+      initY.value = calcY.value;
+      errY.value = "0";
+      updateCalculator();
+      showToast('Y Offset Updated!');
+    };
+
+    const resetAllOffsets = () => {
+      UI.reticleX.value = "0";
+      UI.reticleY.value = "0";
+      state.reticleX = 0;
+      state.reticleY = 0;
+      
+      initX.value = "0";
+      initY.value = "0";
+      updateCalculator();
+      
+      showToast('Offsets Reset to 0!');
+    };
+
+    document.getElementById('assistResetOffsets').onclick = resetAllOffsets;
+    document.getElementById('manualResetOffsets').onclick = resetAllOffsets;
+
+    document.getElementById('correctionModeGroup').onclick = e => {
+      const btn = e.target.closest('[data-cmode]');
+      if (!btn) return;
+      document.querySelectorAll('#correctionModeGroup .btn-opt').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      const v = btn.dataset.cmode;
+      document.getElementById('manualCorrectionView').style.display = v === 'manual' ? 'flex' : 'none';
+      document.getElementById('assistedCorrectionView').style.display = v === 'assisted' ? 'flex' : 'none';
+    };
 
     // ── Main Actions ──────────────────────────────
     document.getElementById('saveBtn').onclick = () => {
