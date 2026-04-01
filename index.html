@@ -872,7 +872,7 @@
             <circle cx="12" cy="13" r="4"></circle>
           </svg>
         </button>
-        <button class="btn-opt" id="recordBtn" style="padding:11px;">Start Rec <span>⏺</span></button>
+        <button class="btn-opt" id="recordBtn" style="padding:11px;">Start Rec <span><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: -1px; margin-left: 3px;"><circle cx="12" cy="12" r="10"></circle></svg></span></button>
       </div>
     </div>
 
@@ -1105,12 +1105,12 @@
     recordBtn.onclick = () => {
       const isRecording = recordBtn.textContent.includes('Stop');
       if (isRecording) {
-        recordBtn.innerHTML = 'Start Rec <span>⏺</span>';
+        recordBtn.innerHTML = 'Start Rec <span><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: -1px; margin-left: 3px;"><circle cx="12" cy="12" r="10"></circle></svg></span>';
         recordBtn.classList.remove('active');
         sendCmd('RECORD_STOP');
         showToast('Recording stopped');
       } else {
-        recordBtn.innerHTML = 'Stop Rec <span class="rec-active">⏺</span>';
+        recordBtn.innerHTML = 'Stop Rec <span class="rec-active"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: -1px; margin-left: 3px;"><circle cx="12" cy="12" r="10"></circle></svg></span>';
         recordBtn.classList.add('active');
         sendCmd('RECORD_START');
         showToast('Recording started');
