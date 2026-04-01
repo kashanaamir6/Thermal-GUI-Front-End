@@ -599,14 +599,9 @@
       color: var(--danger);
     }
 
-    /* ── Animations ── */
-    @keyframes recBlink {
-      0% { opacity: 1; color: var(--danger); }
-      50% { opacity: 0.2; color: var(--danger); }
-      100% { opacity: 1; color: var(--danger); }
-    }
-    .rec-blink {
-      animation: recBlink 1.2s infinite ease-in-out;
+    /* ── Recording Indicator ── */
+    .rec-active {
+      color: var(--danger);
       display: inline-block;
     }
 
@@ -1115,7 +1110,7 @@
         sendCmd('RECORD_STOP');
         showToast('Recording stopped');
       } else {
-        recordBtn.innerHTML = 'Stop Rec <span class="rec-blink">⏺</span>';
+        recordBtn.innerHTML = 'Stop Rec <span class="rec-active">⏺</span>';
         recordBtn.classList.add('active');
         sendCmd('RECORD_START');
         showToast('Recording started');
