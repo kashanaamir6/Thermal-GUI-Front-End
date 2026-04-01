@@ -29,7 +29,7 @@
       --danger: #FF0000;
       --success: #16a34a;
       --warning: #d97706;
-
+      
       /* Layout */
       --radius: 10px;
       --radius-sm: 7px;
@@ -45,9 +45,6 @@
       --surface: #151921;
       --surface2: #1c2533;
       --border: #2d3648;
-      --accent: #f2fa15;
-      --accent-dim: #eab308;
-      --accent-light: rgba(250, 204, 21, 0.12);
       --text: #e2e8f0;
       --text-muted: #94a3b8;
       --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
@@ -280,8 +277,7 @@
       background: var(--accent-light);
       border-color: var(--accent);
       color: var(--accent);
-      z-index: 2;
-      /* Ensure active button is on top for border visibility */
+      z-index: 2; /* Ensure active button is on top for border visibility */
       box-shadow: 0 0 0 1px var(--accent);
     }
 
@@ -605,22 +601,10 @@
 
     /* ── Recording Indicator ── */
     @keyframes recBlink {
-      0% {
-        opacity: 1;
-        color: var(--danger);
-      }
-
-      50% {
-        opacity: 0.2;
-        color: var(--danger);
-      }
-
-      100% {
-        opacity: 1;
-        color: var(--danger);
-      }
+      0% { opacity: 1; color: var(--danger); }
+      50% { opacity: 0.2; color: var(--danger); }
+      100% { opacity: 1; color: var(--danger); }
     }
-
     .rec-active {
       color: var(--danger);
       display: inline-block;
@@ -680,18 +664,9 @@
       cursor: not-allowed;
     }
 
-    #defaultBtn {
-      background: var(--success);
-    }
-
-    #rebootBtn {
-      background: var(--danger);
-    }
-
-    #exitBtn {
-      background: #f97316;
-      box-shadow: 0 3px 14px rgba(249, 115, 22, 0.40);
-    }
+    #defaultBtn { background: var(--success); }
+    #rebootBtn { background: var(--danger); }
+    #exitBtn { background: #f97316; box-shadow: 0 3px 14px rgba(249, 115, 22, 0.40); }
 
     /* Small mobile adjustments */
     @media (max-width: 420px) {
@@ -880,10 +855,8 @@
       <div class="sub-label" style="display:flex; justify-content:space-between; align-items:center;">
         Position
         <div class="btn-group" id="correctionModeGroup" style="gap:4px;">
-          <button class="btn-opt active" data-cmode="manual"
-            style="padding:4px 8px; min-width:0; font-size:10px;">Manual</button>
-          <button class="btn-opt" data-cmode="assisted"
-            style="padding:4px 8px; min-width:0; font-size:10px;">Assisted</button>
+          <button class="btn-opt active" data-cmode="manual" style="padding:4px 8px; min-width:0; font-size:10px;">Manual</button>
+          <button class="btn-opt" data-cmode="assisted" style="padding:4px 8px; min-width:0; font-size:10px;">Assisted</button>
         </div>
       </div>
 
@@ -891,18 +864,15 @@
       <div id="manualCorrectionView" class="input-row">
         <div class="input-group">
           <label for="reticleX">X Offset</label>
-          <input type="text" id="reticleX" value="0" placeholder="e.g. +25 or -30" inputmode="text"
-            autocomplete="off" />
+          <input type="text" id="reticleX" value="0" placeholder="e.g. +25 or -30" inputmode="text" autocomplete="off" />
         </div>
         <div class="input-group">
           <label for="reticleY">Y Offset</label>
-          <input type="text" id="reticleY" value="0" placeholder="e.g. +25 or -30" inputmode="text"
-            autocomplete="off" />
+          <input type="text" id="reticleY" value="0" placeholder="e.g. +25 or -30" inputmode="text" autocomplete="off" />
         </div>
         <div class="input-group" style="flex:0.4;">
           <label>&nbsp;</label>
-          <button class="btn-opt" id="manualResetOffsets"
-            style="height:100%; font-weight:700; padding:0;">Reset</button>
+          <button class="btn-opt" id="manualResetOffsets" style="height:100%; font-weight:700; padding:0;">Reset</button>
         </div>
       </div>
 
@@ -919,61 +889,46 @@
           </div>
           <div class="input-group" style="flex:0.4;">
             <label>&nbsp;</label>
-            <button class="btn-opt" id="assistResetOffsets"
-              style="height:100%; font-weight:700; padding:0;">Reset</button>
+            <button class="btn-opt" id="assistResetOffsets" style="height:100%; font-weight:700; padding:0;">Reset</button>
           </div>
         </div>
 
-        <div
-          style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">
-          Bullet Impact Error (cm at 100m)</div>
-        <div class="input-row" style="flex-direction:column; gap:6px;">
-          <div class="input-group" style="margin-bottom:0;">
-            <div style="display:flex; gap:6px; align-items:stretch; height:32px;">
-              <span
-                style="display:flex; align-items:center; font-weight:700; color:var(--text-muted); font-size:14px;">X:</span>
-              <input type="text" id="assistErrX" value="0" inputmode="numeric"
-                style="flex:0.35; text-align:center; font-size:14px; padding:0;" />
-              <div class="btn-group" id="errDirX" style="flex:0.65; margin-bottom:0; flex-wrap:nowrap; gap:4px;">
-                <button class="btn-opt active" data-dirx="Right" style="padding:0; height:100%;">Right</button>
-                <button class="btn-opt" data-dirx="Left" style="padding:0; height:100%;">Left</button>
+        <div style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Bullet Impact Error (cm at 100m)</div>
+        <div class="input-row" style="flex-direction:column; gap:8px;">
+          <div class="input-group">
+            <div style="display:flex; gap:8px; align-items:stretch;">
+              <span style="display:flex; align-items:center; font-weight:700; color:var(--text-muted); font-size:14px;">X:</span>
+              <input type="text" id="assistErrX" value="0" inputmode="numeric" style="flex:0.35; text-align:center; font-size:16px; padding:6px 4px;" />
+              <div class="btn-group" id="errDirX" style="flex:0.65; margin-bottom:0; flex-wrap:nowrap;">
+                <button class="btn-opt active" data-dirx="Right" style="padding:4px 0;">Right</button>
+                <button class="btn-opt" data-dirx="Left" style="padding:4px 0;">Left</button>
               </div>
             </div>
           </div>
-          <div class="input-group" style="margin-bottom:0;">
-            <div style="display:flex; gap:6px; align-items:stretch; height:32px;">
-              <span
-                style="display:flex; align-items:center; font-weight:700; color:var(--text-muted); font-size:14px;">Y:</span>
-              <input type="text" id="assistErrY" value="0" inputmode="numeric"
-                style="flex:0.35; text-align:center; font-size:14px; padding:0;" />
-              <div class="btn-group" id="errDirY" style="flex:0.65; margin-bottom:0; flex-wrap:nowrap; gap:4px;">
-                <button class="btn-opt active" data-diry="Up" style="padding:0; height:100%;">Up</button>
-                <button class="btn-opt" data-diry="Down" style="padding:0; height:100%;">Down</button>
+          <div class="input-group">
+            <div style="display:flex; gap:8px; align-items:stretch;">
+              <span style="display:flex; align-items:center; font-weight:700; color:var(--text-muted); font-size:14px;">Y:</span>
+              <input type="text" id="assistErrY" value="0" inputmode="numeric" style="flex:0.35; text-align:center; font-size:16px; padding:6px 4px;" />
+              <div class="btn-group" id="errDirY" style="flex:0.65; margin-bottom:0; flex-wrap:nowrap;">
+                <button class="btn-opt active" data-diry="Up" style="padding:4px 0;">Up</button>
+                <button class="btn-opt" data-diry="Down" style="padding:4px 0;">Down</button>
               </div>
             </div>
           </div>
         </div>
 
-        <div
-          style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px;">
-          Calculated Corrective Offset</div>
+        <div style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px;">Calculated Corrective Offset</div>
         <div class="input-row">
           <div class="input-group">
             <div style="display:flex; gap:6px;">
-              <input type="text" id="assistCalcX" value="0" readonly
-                style="flex:1; background:var(--bg); border-color:var(--accent-dim); color:var(--accent);" />
-              <button class="btn-opt" id="assistUpdateX"
-                style="flex:1.5; font-size:11px; font-weight:700; background:var(--accent-light); color:var(--accent); border-color:var(--accent);">Update
-                X</button>
+              <input type="text" id="assistCalcX" value="0" readonly style="flex:1; background:var(--bg); border-color:var(--accent-dim); color:var(--accent);" />
+              <button class="btn-opt" id="assistUpdateX" style="flex:1.5; font-size:11px; font-weight:700; background:var(--accent-light); color:var(--accent); border-color:var(--accent);">Update X</button>
             </div>
           </div>
           <div class="input-group">
             <div style="display:flex; gap:6px;">
-              <input type="text" id="assistCalcY" value="0" readonly
-                style="flex:1; background:var(--bg); border-color:var(--accent-dim); color:var(--accent);" />
-              <button class="btn-opt" id="assistUpdateY"
-                style="flex:1.5; font-size:11px; font-weight:700; background:var(--accent-light); color:var(--accent); border-color:var(--accent);">Update
-                Y</button>
+              <input type="text" id="assistCalcY" value="0" readonly style="flex:1; background:var(--bg); border-color:var(--accent-dim); color:var(--accent);" />
+              <button class="btn-opt" id="assistUpdateY" style="flex:1.5; font-size:11px; font-weight:700; background:var(--accent-light); color:var(--accent); border-color:var(--accent);">Update Y</button>
             </div>
           </div>
         </div>
@@ -986,9 +941,7 @@
       <div class="btn-group">
         <button class="btn-opt" id="snapshotBtn" style="padding:11px;">
           Snapshot
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#ffffff"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            style="vertical-align: -2px; margin-left: 2px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#ffffff" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-left: 2px;">
             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
             <circle cx="12" cy="13" r="4"></circle>
           </svg>
@@ -996,10 +949,7 @@
         <button class="btn-opt" id="recordBtn" style="padding:11px 0;">
           <div style="display:flex; align-items:center; justify-content:center;">
             <span style="width:62px; text-align:right;">Start Rec</span>
-            <span style="margin:0 6px; display:flex;"><svg width="12" height="12" viewBox="0 0 24 24"
-                fill="currentColor">
-                <circle cx="12" cy="12" r="10"></circle>
-              </svg></span>
+            <span style="margin:0 6px; display:flex;"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"></circle></svg></span>
             <span style="width:38px; text-align:left; font-variant-numeric: tabular-nums;">00:00</span>
           </div>
         </button>
@@ -1146,7 +1096,7 @@
     }
 
     // ── Event Handlers ────────────────────────────
-
+    
     // Sliders
     Object.keys(UI.sliders).forEach(id => {
       UI.sliders[id].el.oninput = () => updateSlider(id);
@@ -1178,7 +1128,7 @@
         group.querySelectorAll('.btn-opt, .swatch-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         const key = gid.replace('Group', '');
-        state[key.startsWith('reticle') ? key : key.charAt(0).toLowerCase() + key.slice(1)] =
+        state[key.startsWith('reticle') ? key : key.charAt(0).toLowerCase() + key.slice(1)] = 
           btn.dataset[attr].match(/^\d+$/) ? parseInt(btn.dataset[attr]) : btn.dataset[attr];
       };
     });
@@ -1215,7 +1165,7 @@
     const errY = document.getElementById('assistErrY');
     const calcX = document.getElementById('assistCalcX');
     const calcY = document.getElementById('assistCalcY');
-
+    
     let assistState = { dirX: 'Right', dirY: 'Up' };
 
     const updateCalculator = () => {
@@ -1238,14 +1188,14 @@
         if (v === '+0' || v === '-0') v = '0';
         el.value = v;
         state[el.id] = parseInt(v) || 0;
-
+        
         if (el.id === 'reticleX') initX.value = v || 0;
         else initY.value = v || 0;
         updateCalculator();
       };
       el.onkeydown = e => {
-        if (!['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter', '-', '+'].includes(e.key) &&
-          (e.key < '0' || e.key > '9')) e.preventDefault();
+        if (!['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter', '-', '+'].includes(e.key) && 
+            (e.key < '0' || e.key > '9')) e.preventDefault();
       };
     });
 
@@ -1306,11 +1256,11 @@
       UI.reticleY.value = "0";
       state.reticleX = 0;
       state.reticleY = 0;
-
+      
       initX.value = "0";
       initY.value = "0";
       updateCalculator();
-
+      
       showToast('Offsets Reset to 0!');
     };
 
@@ -1322,7 +1272,7 @@
       if (!btn) return;
       document.querySelectorAll('#correctionModeGroup .btn-opt').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-
+      
       const v = btn.dataset.cmode;
       document.getElementById('manualCorrectionView').style.display = v === 'manual' ? 'flex' : 'none';
       document.getElementById('assistedCorrectionView').style.display = v === 'assisted' ? 'flex' : 'none';
@@ -1337,12 +1287,12 @@
 
     document.getElementById('rebootBtn').onclick = () => confirm('Reboot device?') && sendCmd('REBOOT') && showToast('Rebooting...');
     document.getElementById('exitBtn').onclick = () => sendCmd('SAVE_EXIT') && showToast('Save & Exit sent');
-
+    
     document.getElementById('snapshotBtn').onclick = () => sendCmd('SNAPSHOT') && showToast('Snapshot taken');
     const recordBtn = document.getElementById('recordBtn');
     let recTimerId = null;
     let recStartTime = 0;
-
+    
     function updateRecTimer() {
       if (!recStartTime) return;
       const elapsed = Math.floor((Date.now() - recStartTime) / 1000);
