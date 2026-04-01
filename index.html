@@ -872,7 +872,13 @@
             <circle cx="12" cy="13" r="4"></circle>
           </svg>
         </button>
-        <button class="btn-opt" id="recordBtn" style="padding:11px;">Start Rec <span><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: -1px; margin-left: 3px;"><circle cx="12" cy="12" r="10"></circle></svg></span></button>
+        <button class="btn-opt" id="recordBtn" style="padding:11px 0;">
+          <div style="display:flex; align-items:center; justify-content:center;">
+            <span style="width:62px; text-align:right;">Start Rec</span>
+            <span style="margin:0 6px; display:flex;"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"></circle></svg></span>
+            <span style="width:38px; text-align:left; font-variant-numeric: tabular-nums;">00:00</span>
+          </div>
+        </button>
       </div>
     </div>
 
@@ -1102,15 +1108,38 @@
     
     document.getElementById('snapshotBtn').onclick = () => sendCmd('SNAPSHOT') && showToast('Snapshot taken');
     const recordBtn = document.getElementById('recordBtn');
+    let recTimerId = null;
+    let recStartTime = 0;
+    
+    function updateRecTimer() {
+      if (!recStartTime) return;
+      const elapsed = Math.floor((Date.now() - recStartTime) / 1000);
+      const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+      const s = String(elapsed % 60).padStart(2, '0');
+      recordBtn.innerHTML = `<div style="display:flex; align-items:center; justify-content:center;">
+        <span style="width:62px; text-align:right;">Stop Rec</span>
+        <span class="rec-active" style="margin:0 6px; display:flex;"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"></circle></svg></span>
+        <span style="width:38px; text-align:left; font-variant-numeric: tabular-nums;">${m}:${s}</span>
+      </div>`;
+    }
+
     recordBtn.onclick = () => {
       const isRecording = recordBtn.textContent.includes('Stop');
       if (isRecording) {
-        recordBtn.innerHTML = 'Start Rec <span><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: -1px; margin-left: 3px;"><circle cx="12" cy="12" r="10"></circle></svg></span>';
+        clearInterval(recTimerId);
+        recStartTime = 0;
+        recordBtn.innerHTML = `<div style="display:flex; align-items:center; justify-content:center;">
+          <span style="width:62px; text-align:right;">Start Rec</span>
+          <span style="margin:0 6px; display:flex;"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"></circle></svg></span>
+          <span style="width:38px; text-align:left; font-variant-numeric: tabular-nums;">00:00</span>
+        </div>`;
         recordBtn.classList.remove('active');
         sendCmd('RECORD_STOP');
         showToast('Recording stopped');
       } else {
-        recordBtn.innerHTML = 'Stop Rec <span class="rec-active"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: -1px; margin-left: 3px;"><circle cx="12" cy="12" r="10"></circle></svg></span>';
+        recStartTime = Date.now();
+        updateRecTimer();
+        recTimerId = setInterval(updateRecTimer, 1000);
         recordBtn.classList.add('active');
         sendCmd('RECORD_START');
         showToast('Recording started');
