@@ -45,6 +45,9 @@
       --surface: #151921;
       --surface2: #1c2533;
       --border: #2d3648;
+      --accent: #facc15;
+      --accent-dim: #eab308;
+      --accent-light: rgba(250, 204, 21, 0.12);
       --text: #e2e8f0;
       --text-muted: #94a3b8;
       --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
@@ -878,43 +881,40 @@
 
       <!-- Assisted Mode -->
       <div id="assistedCorrectionView" style="display:none; flex-direction:column; gap:12px;">
-        <div style="background:var(--surface2); padding:8px; border-radius:var(--radius-sm); border:1px solid var(--border);">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <div style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Current Offset</div>
+        <div class="input-row">
+          <div class="input-group">
+            <label>X Offset</label>
+            <input type="text" id="assistInitX" value="0" inputmode="text" />
           </div>
-          <div class="input-row">
-            <div class="input-group">
-              <label>X Offset</label>
-              <input type="text" id="assistInitX" value="0" inputmode="text" />
-            </div>
-            <div class="input-group">
-              <label>Y Offset</label>
-              <input type="text" id="assistInitY" value="0" inputmode="text" />
-            </div>
-            <div class="input-group" style="flex:0.4;">
-              <label>&nbsp;</label>
-              <button class="btn-opt" id="assistResetOffsets" style="height:100%; font-weight:700; background:var(--bg); padding:0;">Reset</button>
-            </div>
+          <div class="input-group">
+            <label>Y Offset</label>
+            <input type="text" id="assistInitY" value="0" inputmode="text" />
+          </div>
+          <div class="input-group" style="flex:0.4;">
+            <label>&nbsp;</label>
+            <button class="btn-opt" id="assistResetOffsets" style="height:100%; font-weight:700; padding:0;">Reset</button>
           </div>
         </div>
 
         <div style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Bullet Impact Error (cm at 100m)</div>
-        <div class="input-row">
-          <div class="input-group">
-            <div style="display:flex; gap:6px;">
-              <input type="text" id="assistErrX" value="0" inputmode="numeric" style="width:40px; padding:8px 4px;" />
-              <div class="btn-group" id="errDirX" style="flex:1;">
-                <button class="btn-opt active" data-dirx="Right">Right</button>
-                <button class="btn-opt" data-dirx="Left">Left</button>
+        <div class="input-row" style="flex-direction:column; gap:6px;">
+          <div class="input-group" style="margin-bottom:0;">
+            <div style="display:flex; gap:6px; align-items:stretch; height:32px;">
+              <span style="display:flex; align-items:center; font-weight:700; color:var(--text-muted); font-size:14px;">X:</span>
+              <input type="text" id="assistErrX" value="0" inputmode="numeric" style="flex:0.35; text-align:center; font-size:14px; padding:0;" />
+              <div class="btn-group" id="errDirX" style="flex:0.65; margin-bottom:0; flex-wrap:nowrap; gap:4px;">
+                <button class="btn-opt active" data-dirx="Right" style="padding:0; height:100%;">Right</button>
+                <button class="btn-opt" data-dirx="Left" style="padding:0; height:100%;">Left</button>
               </div>
             </div>
           </div>
-          <div class="input-group">
-            <div style="display:flex; gap:6px;">
-              <input type="text" id="assistErrY" value="0" inputmode="numeric" style="width:40px; padding:8px 4px;" />
-              <div class="btn-group" id="errDirY" style="flex:1;">
-                <button class="btn-opt active" data-diry="Up">Up</button>
-                <button class="btn-opt" data-diry="Down">Down</button>
+          <div class="input-group" style="margin-bottom:0;">
+            <div style="display:flex; gap:6px; align-items:stretch; height:32px;">
+              <span style="display:flex; align-items:center; font-weight:700; color:var(--text-muted); font-size:14px;">Y:</span>
+              <input type="text" id="assistErrY" value="0" inputmode="numeric" style="flex:0.35; text-align:center; font-size:14px; padding:0;" />
+              <div class="btn-group" id="errDirY" style="flex:0.65; margin-bottom:0; flex-wrap:nowrap; gap:4px;">
+                <button class="btn-opt active" data-diry="Up" style="padding:0; height:100%;">Up</button>
+                <button class="btn-opt" data-diry="Down" style="padding:0; height:100%;">Down</button>
               </div>
             </div>
           </div>
