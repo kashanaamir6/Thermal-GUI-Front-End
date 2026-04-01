@@ -599,6 +599,17 @@
       color: var(--danger);
     }
 
+    /* ── Animations ── */
+    @keyframes recBlink {
+      0% { opacity: 1; color: var(--danger); }
+      50% { opacity: 0.2; color: var(--danger); }
+      100% { opacity: 1; color: var(--danger); }
+    }
+    .rec-blink {
+      animation: recBlink 1.2s infinite ease-in-out;
+      display: inline-block;
+    }
+
     /* ── Bottom Bar ── */
     #saveBar {
       position: fixed;
@@ -855,6 +866,21 @@
       </div>
     </div>
 
+    <!-- ── Media Capture ── -->
+    <div class="card">
+      <div class="card-title">Media Capture</div>
+      <div class="btn-group">
+        <button class="btn-opt" id="snapshotBtn" style="padding:11px;">
+          Snapshot
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#ffffff" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-left: 2px;">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
+        </button>
+        <button class="btn-opt" id="recordBtn" style="padding:11px;">Start Rec <span>⏺</span></button>
+      </div>
+    </div>
+
     <!-- ── 6. Bad Pixel Correction ── -->
     <div class="card">
       <div class="card-title">Bad Pixel Correction</div>
@@ -1079,6 +1105,23 @@
     document.getElementById('rebootBtn').onclick = () => confirm('Reboot device?') && sendCmd('REBOOT') && showToast('Rebooting...');
     document.getElementById('exitBtn').onclick = () => sendCmd('SAVE_EXIT') && showToast('Save & Exit sent');
     
+    document.getElementById('snapshotBtn').onclick = () => sendCmd('SNAPSHOT') && showToast('Snapshot taken');
+    const recordBtn = document.getElementById('recordBtn');
+    recordBtn.onclick = () => {
+      const isRecording = recordBtn.textContent.includes('Stop');
+      if (isRecording) {
+        recordBtn.innerHTML = 'Start Rec <span>⏺</span>';
+        recordBtn.classList.remove('active');
+        sendCmd('RECORD_STOP');
+        showToast('Recording stopped');
+      } else {
+        recordBtn.innerHTML = 'Stop Rec <span class="rec-blink">⏺</span>';
+        recordBtn.classList.add('active');
+        sendCmd('RECORD_START');
+        showToast('Recording started');
+      }
+    };
+
     document.getElementById('badPixelScanBtn').onclick = () => sendCmd('BAD_PIXEL_SCAN') && showToast('Scan initiated');
 
     document.getElementById('defaultBtn').onclick = () => {
